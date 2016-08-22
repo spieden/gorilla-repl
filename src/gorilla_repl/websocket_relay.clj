@@ -28,11 +28,13 @@
 
 (defn- process-message
   [channel data]
-  (let [parsed-message (assoc (json/parse-string data true) :as-html 1)
-        client (nrepl/client @conn Long/MAX_VALUE)
-        replies (nrepl/message client parsed-message)]
-    ;; send the messages out over the WS connection one-by-one.
-    (doall (map (partial send-json-over-ws channel) replies))))
+  (let [parsed-message (assoc (json/parse-string data true) :as-html 1)]
+    (if (:ping parsed-message)
+      (server/send! channel (json/generate-string {:pong true}))
+      (let [client  (nrepl/client @conn Long/MAX_VALUE)
+            replies (nrepl/message client parsed-message)]
+        ;; send the messages out over the WS connection one-by-one.
+        (doall (map (partial send-json-over-ws channel) replies))))))
 
 (defn ring-handler
   "This ring handler expects the client to make a websocket connection to the endpoint. It relays messages back and

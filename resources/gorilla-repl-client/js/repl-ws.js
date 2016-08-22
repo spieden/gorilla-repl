@@ -11,6 +11,15 @@ var repl = (function () {
 
     var self = {};
 
+    // HACK: websockets has a native ping but http-kit doesn't seem to expose a way to use it
+    var schedulePing = function(ws) {
+        setTimeout(function() {
+            self.ws.send(JSON.stringify({"ping": true}));
+            schedulePing();
+        },
+        10000);
+    };
+
     // This is exposed to make it easy to test direct interaction with the nREPL server from the dev tools. It
     // shouldn't be considered part of the public API
     self.sendREPLCommand = function (message) {
@@ -40,6 +49,7 @@ var repl = (function () {
         // The first thing we do is send a clone op, to get a new session.
         self.ws.onopen = function () {
             self.ws.send(JSON.stringify({"op": "clone"}));
+            schedulePing(self.ws);
         };
 
         // If the websocket connection dies we're done for, message the app to tell it so.
@@ -192,6 +202,9 @@ var repl = (function () {
             return;
         }
 
+        if (d.pong) {
+            return;
+        }
 
         // If we get here, then we don't know what the message was for - just log it
         console.log("Unknown response: " + JSON.stringify(d));
