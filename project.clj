@@ -6,6 +6,9 @@
   :description "A rich REPL for Clojure in the notebook style."
   :url "https://github.com/JonyEpsilon/gorilla-repl"
   :license {:name "MIT"}
+  :repositories {"snapshots" {:url      "https://ncgl.jfrog.io/ncgl/libs-snapshot-local/"
+                              :username :env/artifactory_user
+                              :password :env/artifactory_password}}
   :dependencies ^:replace [[org.clojure/clojure "1.6.0"]
                            [http-kit "2.1.18"]
                            [ring/ring-json "0.3.1"]
