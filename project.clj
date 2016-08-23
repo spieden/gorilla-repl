@@ -9,10 +9,14 @@
   :repositories {"snapshots" {:url      "https://ncgl.jfrog.io/ncgl/libs-snapshot-local/"
                               :username :env/artifactory_user
                               :password :env/artifactory_password}}
-  :dependencies ^:replace [[org.clojure/clojure "1.6.0"]
+  :dependencies ^:replace [[org.clojure/clojure "1.9.0-alpha10"]
                            [http-kit "2.1.18"]
+                           [amazonica "0.3.74" :exclusions [com.amazonaws/aws-java-sdk]]
+                           [com.amazonaws/aws-java-sdk-s3 "1.11.26"]
                            [ring/ring-json "0.3.1"]
-                           [cheshire "5.3.1"]
+                           [cheshire "5.3.1" :exclusions [com.fasterxml.jackson.core/jackson-core
+                                                          com.fasterxml.jackson.dataformat/jackson-dataformat-smile]]
+                           [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.6.6"]
                            [compojure "1.1.8"]
                            [org.slf4j/slf4j-api "1.7.7"]
                            [ch.qos.logback/logback-classic "1.1.2"]

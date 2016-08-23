@@ -10,6 +10,7 @@
             [ring.middleware.params :as params]
             [ring.middleware.json :as json]
             [ring.util.response :as res]
+            [gorilla-repl.s3 :as s3]
             [gorilla-repl.files :as files]))
 
 ;; a wrapper for JSON API calls
@@ -25,9 +26,9 @@
   [req]
   ;; TODO: S'pose some error handling here wouldn't be such a bad thing
   (when-let [ws-file (:worksheet-filename (:params req))]
-    (let [_ (print (str "Loading: " ws-file " ... "))
-          ws-data (slurp (str ws-file) :encoding "UTF-8")
-          _ (println "done.")]
+    (let [_       (print (str "Loading: " ws-file " ... "))
+          ws-data (s3/get-worksheet ws-file)
+          _       (println "done.")]
       (res/response {:worksheet-data ws-data}))))
 
 
@@ -38,7 +39,7 @@
   (when-let [ws-data (:worksheet-data (:params req))]
     (when-let [ws-file (:worksheet-filename (:params req))]
       (print (str "Saving: " ws-file " ... "))
-      (spit ws-file ws-data)
+      (s3/put-worksheet ws-file ws-data)
       (println (str "done. [" (java.util.Date.) "]"))
       (res/response {:status "ok"}))))
 
@@ -54,7 +55,7 @@
 ;; API endpoint for getting the list of worksheets in the project
 (defn gorilla-files [req]
   (let [excludes @excludes]
-    (res/response {:files (files/gorilla-filepaths-in-current-directory excludes)})))
+    (res/response {:files (s3/list-worksheets)})))
 
 ;; configuration information that will be made available to the webapp
 (defn set-config [k v] (swap! conf assoc k v))

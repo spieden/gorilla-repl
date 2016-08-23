@@ -32,6 +32,7 @@ var repl = (function () {
         // hard to believe we have to do this
         var loc = window.location,
             url = "wss://" + loc.hostname + ":4433" + loc.pathname.replace(/[^/]+$/,'repl');
+//            url = "ws://" + loc.hostname + ":" + loc.port + loc.pathname.replace(/[^/]+$/,'repl');
 
         self.ws = new WebSocket(url);
 
