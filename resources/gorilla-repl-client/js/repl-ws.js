@@ -34,7 +34,14 @@ var repl = (function () {
             url = "wss://" + loc.hostname + ":4433" + loc.pathname.replace(/[^/]+$/,'repl');
 //            url = "ws://" + loc.hostname + ":" + loc.port + loc.pathname.replace(/[^/]+$/,'repl');
 
-        self.ws = new WebSocket(url);
+        // try twice as first may hit second node in auto scaling group that doesn't have our session
+        // (returns a 401)
+        try {
+            self.ws = new WebSocket(url);
+        }
+        catch (e) {
+            self.ws = new WebSocket(url);
+        }
 
         // we first install a handler that will capture the session id from the clone message. Once it's done its work
         // it will replace the handler with one that handles the rest of the messages, and call the successCallback.
